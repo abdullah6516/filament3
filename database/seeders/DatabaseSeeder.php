@@ -7,7 +7,8 @@ use App\Models\
 {
     User,
     Product,
-    Category
+    Category,
+    Tag
 };
 use Illuminate\Database\Seeder;
 
@@ -35,6 +36,10 @@ class DatabaseSeeder extends Seeder
 
         Category::create([
             'name' => 'category-1',
+        ]);
+
+        Tag::create([
+            'name' => 'tag-1',
         ]);
 
     }
