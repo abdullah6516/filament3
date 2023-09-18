@@ -2,19 +2,23 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Models\Contracts\FilamentUser;
-use Filament\Panel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class product extends Model
 {
     use HasFactory;
 
-    public function canAccessPanel(Panel $panel): bool
+    protected $fillable = ['name', 'price', 'status', 'category_id'];
+
+    public function category(): BelongsTo
     {
-        return $this->is_admin == 1;
+        return $this->belongsTo(Category::class);
     }
+
 
 }
