@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->string('name');
             $table->integer('price');
             $table->unsignedBigInteger('category_id')->nullable()->constrained();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
 

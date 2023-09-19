@@ -8,7 +8,8 @@ use App\Models\
     User,
     Product,
     Category,
-    Tag
+    Tag,
+    Order
 };
 use Illuminate\Database\Seeder;
 
@@ -40,6 +41,13 @@ class DatabaseSeeder extends Seeder
 
         Tag::create([
             'name' => 'tag-1',
+        ]);
+
+        Order::create([
+            'price' => '1000',
+            'user_id' => '1',
+            'product_id' => '1'
+
         ]);
 
     }

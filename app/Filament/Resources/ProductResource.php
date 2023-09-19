@@ -19,6 +19,14 @@ class ProductResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+
+    protected static array $statuses = [
+        'in stock' => 'in stock',
+        'sold out' => 'sold out',
+        'coming soon' => 'coming soon',
+    ];
+
+
     public static function form(Form $form): Form
     {
         return $form
@@ -33,11 +41,7 @@ class ProductResource extends Resource
                 ]),*/
 
                 Forms\Components\Radio::make('status')
-                    ->options([
-                        'in stock' => 'in stock',
-                        'sold out' => 'sold out',
-                        'coming soon' => 'coming soon',
-                    ]),
+                    ->options(self::$statuses),
 
                 Forms\Components\Select::make('category_id')
                     ->relationship('category', 'name'),
@@ -52,18 +56,46 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
+                //Tables\Columns\TextColumn::make('name')->rules(['required', 'min:3']),
+                Tables\Columns\TextInputColumn::make('name')->rules(['required', 'min:3']),
                 Tables\Columns\TextColumn::make('price')->sortable()
                     ->money('usd')
                     ->getStateUsing(function (Product $record): float {
                         return $record->price / 100;
                     }),
-                Tables\Columns\TextColumn::make('status'),
+                Tables\Columns\ToggleColumn::make('is_active'),
+                /*Tables\Columns\TextColumn::make('status')->badge()
+                ->color(fn(string $state): string => match ($state) {
+                'in stock' => 'primary',
+                'sold out' => 'danger',
+                'coming soon' => 'info',
+                }),              */
+                Tables\Columns\SelectColumn::make('status')
+                    ->options(self::$statuses),
                 Tables\Columns\TextColumn::make('category.name'),
-                Tables\Columns\TextColumn::make('tags.name'),
+                Tables\Columns\TextColumn::make('tags.name')->badge(),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('status')
+                    ->options(self::$statuses),
+                Tables\Filters\SelectFilter::make('category')
+                    ->relationship('category', 'name'),
+                Tables\Filters\Filter::make('created_at')
+                    ->form([
+                        Forms\Components\DatePicker::make('created_from'),
+                        Forms\Components\DatePicker::make('created_until'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    })
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
